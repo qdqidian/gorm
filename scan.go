@@ -17,6 +17,10 @@ func prepareValues(values []interface{}, db *DB, columnTypes []*sql.ColumnType, 
 			if field := db.Statement.Schema.LookUpField(name); field != nil {
 				values[idx] = reflect.New(reflect.PtrTo(field.FieldType)).Interface()
 				continue
+				// 如果对象上没有，那就根据sql解析,不是直接使用interface
+			} else if len(columnTypes) >= idx && columnTypes[idx].ScanType() != nil {
+				values[idx] = reflect.New(reflect.PtrTo(columnTypes[idx].ScanType())).Interface()
+				continue
 			}
 			values[idx] = new(interface{})
 		}
